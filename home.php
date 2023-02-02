@@ -21,6 +21,34 @@ if(isset($_GET['page_info'])) {
 
 $page = (isset($_GET['page']))? $_GET['page'] : 1;
 
+if(!empty($_POST)) {
+    $all_data_saved = true;
+    if(!empty($_POST['mg_products'])) {
+        $mg_products = $_POST['mg_products'];
+        foreach ($mg_products as $mg_product_id => $mg_product_metafields) {
+            if(!empty($mg_product_metafields)) {
+                foreach ($mg_product_metafields as $mg_product_metafield_id => $mg_product_metafield_value) {
+                    $response = shopify_call(
+                        $access_token,
+                        str_replace(".myshopify.com", "", $shop),
+                        "/admin/api/2022-10/products/{$mg_product_id}/metafields/{$mg_product_metafield_id}.json",
+                        array(
+                            'metafield' => array(
+                                'id' => $id,
+                                'value' => $mg_product_metafield_value,
+                            )
+                        ),
+                        "PUT"
+                    );
+                    if(trim($response['headers']['status']) != 'HTTP/2 200') {
+                        $all_data_saved = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
 $response = shopify_call(
     $access_token,
     str_replace(".myshopify.com", "", $shop),
@@ -124,7 +152,7 @@ if(!empty($links)) {
                                     if(!empty($metafields['metafields'])) {
                                         foreach ($metafields['metafields'] as $metafield) {
                                             echo '<div>'.$metafield['key'].'</div>';
-                                            echo '<input name="mg_product_metafields['.$metafield['id'].']" type="text" value="'.$metafield['value'].'">';
+                                            echo '<input name="mg_products['.$product['id'].']['.$metafield['id'].']" type="text" value="'.$metafield['value'].'">';
                                         }
                                     }
                                     echo '</td>
