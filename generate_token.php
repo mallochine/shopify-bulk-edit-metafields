@@ -40,6 +40,28 @@ if (hash_equals($hmac, $computed_hmac)) {
         $query = "INSERT INTO `be_stores` SET `shop_url`='{$params['shop']}',`access_token`='{$result['access_token']}',`scope`='{$result['scope']}',`installed_at`='".date('Y-m-d H:i:s')."',`status`='Active'";
         if(mysqli_query($link, $query)) {
             $store_id = mysqli_insert_id($link);
+
+            /*
+             * Webhooks
+             */
+
+            $sc_result = shopify_call(
+                $access_token,
+                str_replace(".myshopify.com", "", $params['shop']),
+                "/admin/api/2022-10/webhooks.json",
+                NULL,
+                "POST",
+                array('Content-Type: application/json'),
+                array(
+                    "webhook" => array(
+                        "topic" => "app/uninstalled",
+                        "address" => BASE_URL."webhooks/uninstalled.php",
+                        "format" => "json"
+                    )
+                )
+            );
+            // TODO: should add logs for fail/success of the webhook.
+
             header("Location: https://".$params['shop']."/admin/apps/".APP_SLUG);
             die;
         }

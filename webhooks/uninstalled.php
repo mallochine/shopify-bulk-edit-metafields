@@ -18,14 +18,5 @@ if(empty($data)) {
     die;
 }
 
-$query = "SELECT * FROM `tr_stores` WHERE shop_url = '{$data['myshopify_domain']}'";
-$result = mysqli_query($link, $query);
-if(mysqli_num_rows($result)) {
-    $row = mysqli_fetch_array($result);
-    
-    $query = "DELETE FROM `tr_webhooks` WHERE store_id = '{$row['store_id']}'";
-    mysqli_query($link, $query);
-
-    $query = "DELETE FROM `tr_stores` WHERE shop_url = '{$data['myshopify_domain']}'";
-    mysqli_query($link, $query);
-}
+$query = "DELETE FROM `be_stores` WHERE shop_url = '{$data['myshopify_domain']}'";
+mysqli_query($link, $query);

@@ -27,8 +27,7 @@ if(mysqli_num_rows($result)) {
     } else {
         die('This request is NOT from Shopify!');
     }
-}
-else {
+} else {
     $redirect_url = BASE_URL."generate_token.php";
     $install_url = "https://" . $shop . "/admin/oauth/authorize?client_id=" . API_KEY . "&scope=" . APP_SCOPES . "&redirect_uri=" . urlencode($redirect_url);
     header("Location: " . $install_url);
